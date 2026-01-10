@@ -63,11 +63,11 @@ The dataset uses the following class mapping:
 
 The dataset preparation follows a one time extraction workflow:
 
-- 1. Galaxy10 DECaLS is downloaded automatically via `astroNN`
-- 2. The raw `.h5` file is cached outside the repository
-- 3. Images are exported into a disk based directory structure
-- 4. Data is split into train, validation, and test sets
-- 5. PyTorch `ImageFolder` is used for all experiments
+1. Galaxy10 DECaLS is downloaded automatically via `astroNN`
+2. The raw `.h5` file is cached outside the repository
+3. Images are exported into a disk based directory structure
+4. Data is split into train, validation, and test sets
+5. PyTorch `ImageFolder` is used for all experiments
 
 After export, `astroNN` is no longer required.
 
