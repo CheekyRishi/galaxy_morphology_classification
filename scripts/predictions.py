@@ -101,40 +101,66 @@ def test_model(
         "labels": all_labels
     }
 
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+from typing import List
+
+
 def plot_confusion_matrix(
     labels: List[int],
     predictions: List[int],
     class_names: List[str],
-    normalize: bool = False
+    normalize: bool = False,
+    cmap: str = "Blues"
 ):
     """
-    Plots a confusion matrix.
+    Plots a confusion matrix with clean class labels.
     """
 
     cm = confusion_matrix(labels, predictions)
 
     if normalize:
-        cm = cm.astype("float") / cm.sum(axis=1, keepdims=True)
+        cm = cm.astype(float) / cm.sum(axis=1, keepdims=True)
 
-    fig, ax = plt.subplots(figsize=(8, 8))
-    im = ax.imshow(cm)
+    display_names = [
+        name.replace("_", " ").title() for name in class_names
+    ]
 
-    ax.set_xticks(np.arange(len(class_names)))
-    ax.set_yticks(np.arange(len(class_names)))
+    fig, ax = plt.subplots(figsize=(9, 9))
+    im = ax.imshow(cm, cmap=cmap)
 
-    ax.set_xticklabels(class_names, rotation=45, ha="right")
-    ax.set_yticklabels(class_names)
+    # Add colorbar
+    cbar = fig.colorbar(im, ax=ax)
+    cbar.ax.set_ylabel(
+        "Normalized Count" if normalize else "Count",
+        rotation=90
+    )
+
+    ax.set_xticks(np.arange(len(display_names)))
+    ax.set_yticks(np.arange(len(display_names)))
+
+    ax.set_xticklabels(display_names, rotation=45, ha="right")
+    ax.set_yticklabels(display_names)
 
     ax.set_xlabel("Predicted Label")
     ax.set_ylabel("True Label")
     ax.set_title("Confusion Matrix")
 
-    for i in range(len(class_names)):
-        for j in range(len(class_names)):
+    for i in range(len(display_names)):
+        for j in range(len(display_names)):
             value = cm[i, j]
-            ax.text(j, i, f"{value:.2f}" if normalize else value,
-                    ha="center", va="center")
+            text = f"{value:.2f}" if normalize else int(value)
+            ax.text(
+                j,
+                i,
+                text,
+                ha="center",
+                va="center",
+                color="white" if value > cm.max() * 0.6 else "black"
+            )
 
     plt.tight_layout()
     plt.show()
+
     
