@@ -6,9 +6,11 @@ image classification data.
 import os
 from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision import datasets, transforms
-from typing import Tuple, List
+from typing import Tuple, List, Callable
 from PIL import Image
 import numpy as np
+import torchvision.transforms
+import torch
 
 DEFAULT_NUM_WORKERS = min(4, os.cpu_count())
 
@@ -59,13 +61,22 @@ def create_dataloaders(
     return train_loader, val_loader, test_loader, class_names
 
 class ViTDataset(Dataset):
-    def __init__(self, root_dir, class_names, image_size, patch_size):
+    def __init__(
+        self,
+        root_dir: str,
+        class_names: List[str],
+        image_size: int,
+        patch_size: int,
+        transform: torchvision.transforms
+    ) -> None:
+        
         self.root_dir = root_dir
         self.class_names = class_names
         self.image_size = image_size
         self.patch_size = patch_size
+        self.transform = transform
 
-        self.samples = []
+        self.samples: List[Tuple[str, int]] = []
         for idx, cls in enumerate(class_names):
             cls_path = os.path.join(root_dir, cls)
             for img_name in os.listdir(cls_path):
@@ -73,12 +84,11 @@ class ViTDataset(Dataset):
                     (os.path.join(cls_path, img_name), idx)
                 )
 
-        self.transform = transforms.Compose([
-            transforms.Resize((image_size, image_size)),
-            transforms.ToTensor()
-        ])
-
-    def _patchify(self, img):
+    def _patchify(self, img: torch.Tensor) -> torch.Tensor:
+        """
+        img shape: (C, H, W)
+        returns: (num_patches, patch_dim)
+        """
         c, h, w = img.shape
         p = self.patch_size
 
@@ -89,10 +99,10 @@ class ViTDataset(Dataset):
 
         return patches
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.samples)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int]:
         img_path, label = self.samples[idx]
         image = Image.open(img_path).convert("RGB")
         image = self.transform(image)
@@ -103,32 +113,27 @@ class ViTDataset(Dataset):
 
 
 def dataloader_vit(
-    data_dir,
-    class_names,
-    image_size,
-    patch_size,
-    batch_size,
-    validation=True,
-    seed=42,
-    num_workers=4
+    data_dir: str,
+    class_names: List[str],
+    image_size: int,
+    patch_size: int,
+    batch_size: int,
+    train_transform: torchvision.transforms,
+    eval_transform: torchvision.transforms,
+    validation: bool = True,
+    seed: int = 42,
+    num_workers: int = 4
 ):
-    """
-    Returns train, val (optional), and test dataloaders.
-
-    Split:
-    - Train: 80%
-    - Val:   10%
-    - Test:  10%
-    """
-
-    dataset = ViTDataset(
+    # Base dataset only to get indices
+    base_dataset = ViTDataset(
         root_dir=data_dir,
         class_names=class_names,
         image_size=image_size,
-        patch_size=patch_size
+        patch_size=patch_size,
+        transform=eval_transform
     )
 
-    dataset_size = len(dataset)
+    dataset_size = len(base_dataset)
     indices = np.arange(dataset_size)
 
     np.random.seed(seed)
@@ -141,8 +146,19 @@ def dataloader_vit(
     val_indices = indices[train_end:val_end]
     test_indices = indices[val_end:]
 
-    train_dataset = Subset(dataset, train_indices)
-    test_dataset = Subset(dataset, test_indices)
+    train_dataset = Subset(
+        ViTDataset(
+            data_dir, class_names, image_size, patch_size, train_transform
+        ),
+        train_indices
+    )
+
+    test_dataset = Subset(
+        ViTDataset(
+            data_dir, class_names, image_size, patch_size, eval_transform
+        ),
+        test_indices
+    )
 
     train_loader = DataLoader(
         train_dataset,
@@ -161,7 +177,13 @@ def dataloader_vit(
     )
 
     if validation:
-        val_dataset = Subset(dataset, val_indices)
+        val_dataset = Subset(
+            ViTDataset(
+                data_dir, class_names, image_size, patch_size, eval_transform
+            ),
+            val_indices
+        )
+
         val_loader = DataLoader(
             val_dataset,
             batch_size=batch_size,
@@ -169,6 +191,7 @@ def dataloader_vit(
             num_workers=num_workers,
             pin_memory=True
         )
+
         return train_loader, val_loader, test_loader
 
     return train_loader, test_loader
