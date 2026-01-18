@@ -22,6 +22,8 @@ def save_model(
         model_dir = "resnet50"
     elif "resnet26" in name_lower:
         model_dir = "resnet26"
+    elif "resnet18" in name_lower:
+        model_dir = "resnet18"
     elif "vgg16" in name_lower:
         model_dir = "vgg16"
     elif "vgg19" in name_lower:
