@@ -201,7 +201,6 @@ def train(model: torch.nn.Module,
             print(f"Early stopping triggered at epoch {epoch+1}")
             break
 
+    return results, early_stopping.best_epoch
 
-    # Return the filled results at the end of the epochs
-    return results
 
