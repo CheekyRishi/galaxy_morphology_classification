@@ -124,7 +124,8 @@ def train(model: torch.nn.Module,
           loss_fn: torch.nn.Module,
           epochs: int,
           device: torch.device,
-          validation: bool) -> Dict[str, List[float]]:
+          validation: bool,
+          early_stopping=None) -> Dict[str, List[float]]:
     """Trains and tests a PyTorch model.
 
     Passes a target PyTorch models through train_step() and test_step()
@@ -174,12 +175,12 @@ def train(model: torch.nn.Module,
                                           loss_fn=loss_fn,
                                           optimizer=optimizer,
                                           device=device)
+        
         test_loss, test_acc = test_step(model=model,
-          dataloader=test_dataloader,
-          loss_fn=loss_fn,
-          device=device)
-
-        # Print out what's happening
+                                        dataloader=test_dataloader,
+                                        loss_fn=loss_fn,
+                                        device=device)
+       
         print(
           f"Epoch: {epoch+1} | "
           f"train_loss: {train_loss:.4f} | "
@@ -188,11 +189,18 @@ def train(model: torch.nn.Module,
           f"{eval_acc_key}: {test_acc:.4f}"
         )
 
-        # Update results dictionary
         results["train_loss"].append(train_loss)
         results["train_acc"].append(train_acc)
         results[eval_loss_key].append(test_loss)
         results[eval_acc_key].append(test_acc)
+
+        if early_stopping is not None:
+            early_stopping.step(test_loss, epoch + 1)
+
+        if early_stopping.should_stop:
+            print(f"Early stopping triggered at epoch {epoch+1}")
+            break
+
 
     # Return the filled results at the end of the epochs
     return results
