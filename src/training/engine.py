@@ -125,39 +125,44 @@ def train(model: torch.nn.Module,
           epochs: int,
           device: torch.device,
           validation: bool,
-          early_stopping=None) -> Dict[str, List[float]]:
-    """Trains and tests a PyTorch model.
+          early_stopping=None) -> Tuple[Dict[str, List[float]], int]:
+    """
+    Trains and evaluates a PyTorch model.
 
-    Passes a target PyTorch models through train_step() and test_step()
-    functions for a number of epochs, training and testing the model
-    in the same epoch loop.
+    The model is trained using `train_step()` and evaluated using
+    `test_step()` for a specified number of epochs. If an
+    EarlyStopping object is provided, training may stop before
+    reaching the maximum number of epochs.
 
-    Calculates, prints and stores evaluation metrics throughout.
+    Metrics are logged for each epoch, and the epoch corresponding
+    to the best validation loss is tracked.
 
     Args:
-    model: A PyTorch model to be trained and tested.
-    train_dataloader: A DataLoader instance for the model to be trained on.
-    test_dataloader: A DataLoader instance for the model to be tested on.
-    optimizer: A PyTorch optimizer to help minimize the loss function.
-    loss_fn: A PyTorch loss function to calculate loss on both datasets.
-    epochs: An integer indicating how many epochs to train for.
-    device: A target device to compute on (e.g. "cuda" or "cpu").
+        model: A PyTorch model to be trained and evaluated.
+        train_dataloader: DataLoader for the training dataset.
+        test_dataloader: DataLoader for the validation or test dataset.
+        optimizer: Optimizer used to update model parameters.
+        loss_fn: Loss function used for optimization.
+        epochs: Maximum number of epochs to train for.
+        device: Target device for computation ("cuda" or "cpu").
+        validation: If True, metrics are logged as validation metrics.
+        early_stopping: Optional EarlyStopping object to control
+            early termination of training.
 
     Returns:
-    A dictionary of training and testing loss as well as training and
-    testing accuracy metrics. Each metric has a value in a list for 
-    each epoch.
-    In the form: {train_loss: [...],
-              train_acc: [...],
-              test_loss: [...],
-              test_acc: [...]} 
-    For example if training for epochs=2: 
-             {train_loss: [2.0616, 1.0537],
-              train_acc: [0.3945, 0.3945],
-              test_loss: [1.2641, 1.5706],
-              test_acc: [0.3400, 0.2973]} 
-    """
+        A tuple containing:
+            - results (Dict[str, List[float]]):
+                Dictionary with per-epoch metrics.
+                Keys include:
+                    "train_loss", "train_acc",
+                    "val_loss" / "test_loss",
+                    "val_acc" / "test_acc"
 
+            - best_epoch (Optional[int]):
+                Epoch number corresponding to the lowest validation loss.
+                Returns None if early stopping is not used.
+    """
+    
     eval_loss_key = "val_loss" if validation else "test_loss"
     eval_acc_key  = "val_acc"  if validation else "test_acc"
 
