@@ -64,21 +64,26 @@ class ViTDataset(Dataset):
     def __init__(
         self,
         root_dir: str,
+        split: str,  # "train", "val", or "test"
         class_names: List[str],
         image_size: int,
         patch_size: int,
         transform: torchvision.transforms
     ) -> None:
-        
+
         self.root_dir = root_dir
+        self.split = split
         self.class_names = class_names
         self.image_size = image_size
         self.patch_size = patch_size
         self.transform = transform
 
         self.samples: List[Tuple[str, int]] = []
+
+        split_dir = os.path.join(root_dir, split)
+
         for idx, cls in enumerate(class_names):
-            cls_path = os.path.join(root_dir, cls)
+            cls_path = os.path.join(split_dir, cls)
             for img_name in os.listdir(cls_path):
                 self.samples.append(
                     (os.path.join(cls_path, img_name), idx)
@@ -112,6 +117,7 @@ class ViTDataset(Dataset):
         return patches, label
 
 
+
 def dataloader_vit(
     data_dir: str,
     class_names: List[str],
@@ -121,43 +127,25 @@ def dataloader_vit(
     train_transform: torchvision.transforms,
     eval_transform: torchvision.transforms,
     validation: bool = True,
-    seed: int = 42,
     num_workers: int = 4
 ):
-    # Base dataset only to get indices
-    base_dataset = ViTDataset(
+    """
+    Creates DataLoaders for Vision Transformer training.
+
+    Assumes directory structure:
+    root/
+      ├─ train/
+      ├─ val/
+      └─ test/
+    """
+
+    train_dataset = ViTDataset(
         root_dir=data_dir,
+        split="train",
         class_names=class_names,
         image_size=image_size,
         patch_size=patch_size,
-        transform=eval_transform
-    )
-
-    dataset_size = len(base_dataset)
-    indices = np.arange(dataset_size)
-
-    np.random.seed(seed)
-    np.random.shuffle(indices)
-
-    train_end = int(0.8 * dataset_size)
-    val_end = int(0.9 * dataset_size)
-
-    train_indices = indices[:train_end]
-    val_indices = indices[train_end:val_end]
-    test_indices = indices[val_end:]
-
-    train_dataset = Subset(
-        ViTDataset(
-            data_dir, class_names, image_size, patch_size, train_transform
-        ),
-        train_indices
-    )
-
-    test_dataset = Subset(
-        ViTDataset(
-            data_dir, class_names, image_size, patch_size, eval_transform
-        ),
-        test_indices
+        transform=train_transform
     )
 
     train_loader = DataLoader(
@@ -166,6 +154,33 @@ def dataloader_vit(
         shuffle=True,
         num_workers=num_workers,
         pin_memory=True
+    )
+
+    if validation:
+        val_dataset = ViTDataset(
+            root_dir=data_dir,
+            split="val",
+            class_names=class_names,
+            image_size=image_size,
+            patch_size=patch_size,
+            transform=eval_transform
+        )
+
+        val_loader = DataLoader(
+            val_dataset,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=num_workers,
+            pin_memory=True
+        )
+
+    test_dataset = ViTDataset(
+        root_dir=data_dir,
+        split="test",
+        class_names=class_names,
+        image_size=image_size,
+        patch_size=patch_size,
+        transform=eval_transform
     )
 
     test_loader = DataLoader(
@@ -177,23 +192,9 @@ def dataloader_vit(
     )
 
     if validation:
-        val_dataset = Subset(
-            ViTDataset(
-                data_dir, class_names, image_size, patch_size, eval_transform
-            ),
-            val_indices
-        )
-
-        val_loader = DataLoader(
-            val_dataset,
-            batch_size=batch_size,
-            shuffle=False,
-            num_workers=num_workers,
-            pin_memory=True
-        )
-
         return train_loader, val_loader, test_loader
 
     return train_loader, test_loader
+
 
 
