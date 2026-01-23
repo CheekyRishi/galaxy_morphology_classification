@@ -47,7 +47,7 @@ def train_step(model: torch.nn.Module,
 
         # 2. Calculate  and accumulate loss
         loss = loss_fn(y_pred, y)
-        train_loss += loss.item() 
+        train_loss += loss.item() * y.size(0)
 
         # 3. Optimizer zero grad
         optimizer.zero_grad()
@@ -59,12 +59,13 @@ def train_step(model: torch.nn.Module,
         optimizer.step()
 
         # Calculate and accumulate accuracy metric across all batches
-        y_pred_class = torch.argmax(torch.softmax(y_pred, dim=1), dim=1)
-        train_acc += (y_pred_class == y).sum().item()/len(y_pred)
+        y_pred_class = y_pred.argmax(dim=1)
+        train_acc += (y_pred_class == y).sum().item()
+
 
     # Adjust metrics to get average loss and accuracy per batch 
-    train_loss = train_loss / len(dataloader)
-    train_acc = train_acc / len(dataloader)
+    train_loss = train_loss / len(dataloader.dataset)
+    train_acc = train_acc / len(dataloader.dataset)
     return train_loss, train_acc
 
 def test_step(model: torch.nn.Module, 
@@ -106,15 +107,16 @@ def test_step(model: torch.nn.Module,
 
             # 2. Calculate and accumulate loss
             loss = loss_fn(test_pred_logits, y)
-            test_loss += loss.item()
+            test_loss += loss.item() * y.size(0)
 
             # Calculate and accumulate accuracy
             test_pred_labels = test_pred_logits.argmax(dim=1)
-            test_acc += ((test_pred_labels == y).sum().item()/len(test_pred_labels))
+            test_acc += (test_pred_labels == y).sum().item()
 
     # Adjust metrics to get average loss and accuracy per batch 
-    test_loss = test_loss / len(dataloader)
-    test_acc = test_acc / len(dataloader)
+    test_loss = test_loss / len(dataloader.dataset)
+    test_acc = test_acc / len(dataloader.dataset)
+
     return test_loss, test_acc
 
 def train(model: torch.nn.Module, 
@@ -206,6 +208,84 @@ def train(model: torch.nn.Module,
             print(f"Early stopping triggered at epoch {epoch+1}")
             break
 
+    best_epoch = early_stopping.best_epoch if early_stopping is not None else None
+
+    return results, best_epoch
+
+
+def train_vit(
+    model: torch.nn.Module,
+    train_dataloader: torch.utils.data.DataLoader,
+    val_dataloader: torch.utils.data.DataLoader,
+    optimizer: torch.optim.Optimizer,
+    loss_fn: torch.nn.Module,
+    epochs: int,
+    device: torch.device,
+    early_stopping,
+    checkpoint_path: str = "vit_best.pth",
+    verbose: bool = True
+) -> Tuple[Dict[str, List[float]], int]:
+    """
+    Trains a Vision Transformer model with early stopping
+    and best-checkpoint saving.
+
+    This function is intentionally ViT-specific and should
+    not be reused for CNNs.
+
+    Returns:
+        results: Dict containing per-epoch metrics
+        best_epoch: Epoch with lowest validation loss
+    """
+
+    results = {
+        "train_loss": [],
+        "train_acc": [],
+        "val_loss": [],
+        "val_acc": []
+    }
+
+    best_val_loss = float("inf")
+
+    for epoch in tqdm(range(epochs), desc="Training ViT"):
+        train_loss, train_acc = train_step(
+            model=model,
+            dataloader=train_dataloader,
+            loss_fn=loss_fn,
+            optimizer=optimizer,
+            device=device
+        )
+
+        val_loss, val_acc = test_step(
+            model=model,
+            dataloader=val_dataloader,
+            loss_fn=loss_fn,
+            device=device
+        )
+
+        results["train_loss"].append(train_loss)
+        results["train_acc"].append(train_acc)
+        results["val_loss"].append(val_loss)
+        results["val_acc"].append(val_acc)
+
+        if verbose:
+            print(
+                f"Epoch {epoch+1:03d} | "
+                f"train_loss: {train_loss:.4f} | "
+                f"train_acc: {train_acc:.4f} | "
+                f"val_loss: {val_loss:.4f} | "
+                f"val_acc: {val_acc:.4f}"
+            )
+
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            torch.save(model.state_dict(), checkpoint_path)
+
+        early_stopping.step(val_loss, epoch + 1)
+        if early_stopping.should_stop:
+            print(
+                f"Early stopping triggered at epoch {epoch+1}. "
+                f"Best epoch was {early_stopping.best_epoch}"
+            )
+            break
+
     return results, early_stopping.best_epoch
-
-
