@@ -216,37 +216,45 @@ def train(model: torch.nn.Module,
 def train_vit(
     model: torch.nn.Module,
     train_dataloader: torch.utils.data.DataLoader,
-    val_dataloader: torch.utils.data.DataLoader,
+    eval_dataloader: torch.utils.data.DataLoader,
     optimizer: torch.optim.Optimizer,
     loss_fn: torch.nn.Module,
     epochs: int,
     device: torch.device,
     early_stopping,
+    validation: bool = True,
     checkpoint_path: str = "vit_best.pth",
     verbose: bool = True
 ) -> Tuple[Dict[str, List[float]], int]:
     """
-    Trains a Vision Transformer model with early stopping
-    and best-checkpoint saving.
+    Trains a Vision Transformer model.
 
-    This function is intentionally ViT-specific and should
-    not be reused for CNNs.
+    If validation=True:
+        Uses validation dataloader and logs val_* metrics
+
+    If validation=False:
+        Uses test dataloader and logs test_* metrics
+        (useful for balanced-dataset experiments)
 
     Returns:
-        results: Dict containing per-epoch metrics
-        best_epoch: Epoch with lowest validation loss
+        results: Dict with per-epoch metrics
+        best_epoch: Epoch with lowest eval loss
     """
+
+    eval_loss_key = "val_loss" if validation else "test_loss"
+    eval_acc_key  = "val_acc"  if validation else "test_acc"
 
     results = {
         "train_loss": [],
         "train_acc": [],
-        "val_loss": [],
-        "val_acc": []
+        eval_loss_key: [],
+        eval_acc_key: []
     }
 
-    best_val_loss = float("inf")
+    best_eval_loss = float("inf")
 
     for epoch in tqdm(range(epochs), desc="Training ViT"):
+      
         train_loss, train_acc = train_step(
             model=model,
             dataloader=train_dataloader,
@@ -255,32 +263,32 @@ def train_vit(
             device=device
         )
 
-        val_loss, val_acc = test_step(
+        eval_loss, eval_acc = test_step(
             model=model,
-            dataloader=val_dataloader,
+            dataloader=eval_dataloader,
             loss_fn=loss_fn,
             device=device
         )
 
         results["train_loss"].append(train_loss)
         results["train_acc"].append(train_acc)
-        results["val_loss"].append(val_loss)
-        results["val_acc"].append(val_acc)
+        results[eval_loss_key].append(eval_loss)
+        results[eval_acc_key].append(eval_acc)
 
         if verbose:
             print(
                 f"Epoch {epoch+1:03d} | "
                 f"train_loss: {train_loss:.4f} | "
                 f"train_acc: {train_acc:.4f} | "
-                f"val_loss: {val_loss:.4f} | "
-                f"val_acc: {val_acc:.4f}"
+                f"{eval_loss_key}: {eval_loss:.4f} | "
+                f"{eval_acc_key}: {eval_acc:.4f}"
             )
 
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
+        if eval_loss < best_eval_loss:
+            best_eval_loss = eval_loss
             torch.save(model.state_dict(), checkpoint_path)
 
-        early_stopping.step(val_loss, epoch + 1)
+        early_stopping.step(eval_loss, epoch + 1)
         if early_stopping.should_stop:
             print(
                 f"Early stopping triggered at epoch {epoch+1}. "
