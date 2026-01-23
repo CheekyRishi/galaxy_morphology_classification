@@ -21,4 +21,3 @@ class EarlyStopping:
             if self.counter >= self.patience:
                 self.should_stop = True
 
-
