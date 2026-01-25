@@ -20,6 +20,17 @@ from src.models.get_model import get_model
 
 _MODEL_CACHE = {}
 
+MODEL_LABELS = {
+    "Vision Transformer (ViT)": "vit",
+    "ResNet 18": "resnet18",
+    "ResNet 26": "resnet26",
+    "ResNet 50": "resnet50",
+    "Custom CNN": "custom_cnn",
+    "VGG 16": "vgg16",
+    "VGG 19": "vgg19",
+}
+
+
 def patchify(image_tensor, patch_size):
     """
     image_tensor: (1, 3, H, W)
@@ -80,9 +91,12 @@ def get_transform(model_name: str):
 
 # ---- INFERENCE ----
 @torch.inference_mode()
-def predict(image: Image.Image, model_name: str):
+def predict(image: Image.Image, model_label: str):
     if image is None:
         return "No image provided", {}
+
+    # Map UI label -> internal model key
+    model_name = MODEL_LABELS[model_label]
 
     model = load_model(model_name)
     transform = get_transform(model_name)
@@ -93,19 +107,28 @@ def predict(image: Image.Image, model_name: str):
     if model_name.lower() == "vit":
         tensor = patchify(tensor, patch_size=VIT_PATCH_SIZE)
 
-    logits = model(tensor)
+    with torch.no_grad():
+        logits = model(tensor)
+        probs = F.softmax(logits, dim=1).squeeze(0)
 
-    probs = F.softmax(logits, dim=1).squeeze(0)
-
+    # Full probability dictionary (useful for plots / tables)
     probs_dict = {
         CLASS_NAMES[i]: float(probs[i])
         for i in range(len(CLASS_NAMES))
     }
 
-    top_class = max(probs_dict, key=probs_dict.get)
-    confidence = probs_dict[top_class]
+    # Top 3 predictions
+    topk = torch.topk(probs, k=3)
 
-    return f"{top_class} ({confidence:.3f})", probs_dict
+    results = []
+    for idx, score in zip(topk.indices, topk.values):
+        class_name = CLASS_NAMES[idx.item()]
+        results.append(f"{class_name}: {score.item():.3f}")
+
+    top3_text = "\n".join(results)
+
+    return top3_text, probs_dict
+
 
 
 # ---- GRADIO UI ----
@@ -116,14 +139,14 @@ with gr.Blocks(title="Galaxy Morphology Classification") as demo:
     with gr.Row():
         image_input = gr.Image(type="pil", label="Galaxy Image")
         model_dropdown = gr.Dropdown(
-            choices=list(CHECKPOINTS.keys()),
-            value="resnet50",
-            label="Model"
-        )
-
+        choices=list(MODEL_LABELS.keys()),
+        value="Vision Transformer (ViT)",
+        label="Model"
+    )
+        
     predict_btn = gr.Button("Predict")
 
-    label_output = gr.Textbox(label="Prediction")
+    label_output = gr.Textbox(label="Top 3 Prediction")
     prob_output = gr.Label(label="Class Probabilities")
 
     predict_btn.click(
