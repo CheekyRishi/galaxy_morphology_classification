@@ -10,12 +10,12 @@ import gradio as gr
 from PIL import Image
 
 from config import DEVICE, VIT_IMAGE_SIZE,VIT_PATCH_SIZE, IMAGE_SIZE, CLASS_NAMES, CHECKPOINTS
-from data.transforms import (
+from src.data.transforms import (
     get_eval_transforms,
     get_vit_eval_transform
 )
 
-from models.get_model import get_model
+from src.models.get_model import get_model
 
 _MODEL_CACHE = {}
 
