@@ -40,6 +40,8 @@ def create_dataloaders(
         shuffle=True,
         num_workers=num_workers,
         pin_memory=True,
+        prefetch_factor=2,
+        persistent_workers=False
     )
 
     val_loader = DataLoader(
@@ -48,6 +50,8 @@ def create_dataloaders(
         shuffle=False,
         num_workers=num_workers,
         pin_memory=True,
+        prefetch_factor=2,
+        persistent_workers=False
     )
 
     test_loader = DataLoader(
@@ -56,6 +60,8 @@ def create_dataloaders(
         shuffle=False,
         num_workers=num_workers,
         pin_memory=True,
+        prefetch_factor=2,
+        persistent_workers=False
     )
 
     return train_loader, val_loader, test_loader, class_names
@@ -153,7 +159,9 @@ def dataloader_vit(
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
-        pin_memory=True
+        pin_memory=True,
+        persistent_workers=False,
+        prefetch_factor=2
     )
 
     if validation:
@@ -171,7 +179,9 @@ def dataloader_vit(
             batch_size=batch_size,
             shuffle=False,
             num_workers=num_workers,
-            pin_memory=True
+            pin_memory=True,
+            persistent_workers=False,
+            prefetch_factor=2
         )
 
     test_dataset = ViTDataset(
@@ -188,7 +198,9 @@ def dataloader_vit(
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        pin_memory=True
+        pin_memory=True,
+        persistent_workers=False,
+        prefetch_factor=2
     )
 
     if validation:
