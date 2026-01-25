@@ -6,3 +6,7 @@ __pycache__/
 *.pth
 *.jpg
 .ipynb_checkpoints/
+
+# Allow model checkpoints (tracked via Git LFS)
+!checkpoints/
+!checkpoints/**/*.pth
