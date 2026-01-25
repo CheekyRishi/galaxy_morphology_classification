@@ -19,14 +19,13 @@ CLASS_NAMES = [
     "unbarred_tight_spiral",
 ]
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-
 CHECKPOINTS = {
-    "resnet50": BASE_DIR / "checkpoints/resnet50/Resnet50_62_epochs_trainable_classifier_early_stopper.pth",
-    "resnet18": BASE_DIR / "checkpoints/resnet18/Resnet18_29_epochs_trainable_classifier_early_stopping.pth",
-    "resnet26": BASE_DIR / "checkpoints/resnet26/Resnet26_33_epochs_trainable_classifier_early_stopping.pth",
-    "custom_cnn": BASE_DIR / "checkpoints/custom_cnn/CustomCNN_25_epochs_early_stopping.pth",
-    "vgg16": BASE_DIR / "checkpoints/vgg16/VGG16_44_epochs_trainable_classifier_early_stopping_balanced_dataset.pth",
-    "vgg19": BASE_DIR / "checkpoints/vgg19/VGG19_60_epochs_trainable_classifier_early_stopping.pth",
-    "vit": BASE_DIR / "checkpoints/vit/vit_best.pth",
+    "resnet50": "checkpoints/resnet50/Resnet50_62_epochs_trainable_classifier_early_stopper.pth",
+    "resnet18": "checkpoints/resnet18/Resnet18_29_epochs_trainable_classifier_early_stopping.pth",
+    "resnet26": "checkpoints/resnet26/Resnet26_33_epochs_trainable_classifier_early_stopping.pth",
+    "custom_cnn": "checkpoints/custom_cnn/CustomCNN_25_epochs_early_stopping.pth",
+    "vgg16": "checkpoints/vgg16/VGG16_44_epochs_trainable_classifier_early_stopping_balanced_dataset.pth",
+    "vgg19": "checkpoints/vgg19/VGG19_60_epochs_trainable_classifier_early_stopping.pth",
+    "vit": "checkpoints/vit/vit_best.pth",
 }
+
