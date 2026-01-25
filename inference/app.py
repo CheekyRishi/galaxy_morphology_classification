@@ -8,6 +8,7 @@ import torch
 import torch.nn.functional as F
 import gradio as gr
 from PIL import Image
+from huggingface_hub import hf_hub_download
 
 from config import DEVICE, VIT_IMAGE_SIZE,VIT_PATCH_SIZE, IMAGE_SIZE, CLASS_NAMES, CHECKPOINTS
 from src.data.transforms import (
@@ -45,32 +46,28 @@ def patchify(image_tensor, patch_size):
 
     return patches
 
-
 def load_model(model_name: str):
+    model_name = model_name.lower()
+
     if model_name in _MODEL_CACHE:
         return _MODEL_CACHE[model_name]
 
-    checkpoint_path = CHECKPOINTS[model_name]
+    ckpt_path = hf_hub_download(
+        repo_id="Rishabh-9090/galaxy-morphology-models",
+        filename=CHECKPOINTS[model_name],
+        repo_type="model"
+    )
 
-    if not checkpoint_path.exists():
-        raise FileNotFoundError(f"Checkpoint not found at: {checkpoint_path}")
-    
-    model_or_tuple = get_model(model_name, num_classes=len(CLASS_NAMES))
+    model = get_model(model_name, num_classes=len(CLASS_NAMES))
 
-
-    # Handle CNNs returning (model, transform)
-    if isinstance(model_or_tuple, tuple):
-        model = model_or_tuple[0]
-    else:
-        model = model_or_tuple
-
-    state = torch.load(checkpoint_path, map_location=DEVICE)
+    state = torch.load(ckpt_path, map_location=DEVICE)
     model.load_state_dict(state)
     model.to(DEVICE)
     model.eval()
 
     _MODEL_CACHE[model_name] = model
     return model
+
 
 
 def get_transform(model_name: str):
