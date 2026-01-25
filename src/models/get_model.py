@@ -1,11 +1,10 @@
 import torch.nn as nn
 from torchvision import models
 
-from models.resnet import resnet50,resnet26,resnet18
-from models.vit import VisionTransformer
-from models.vgg import vgg16,vgg19
-from models.custom_cnn import custom_cnn
-
+from src.models.resnet import resnet50, resnet26, resnet18
+from src.models.vit import VisionTransformer
+from src.models.vgg import vgg16, vgg19
+from src.models.custom_cnn import custom_cnn
 
 def get_model(name: str, num_classes: int):
     name = name.lower()
