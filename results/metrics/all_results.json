@@ -1,0 +1,128 @@
+{
+  "ResNet50": {
+    "unbalanced_train": {
+      "unbalanced_test": {
+        "accuracy": 0.5259,
+        "loss": 1.3268
+      }
+    },
+    "balanced_train": {
+      "balanced_test": {
+        "accuracy": 0.4833,
+        "loss": 1.4588
+      },
+      "unbalanced_test": {
+        "accuracy": 0.4752,
+        "loss": 1.4446
+      }
+    }
+  },
+  "ResNet26": {
+    "unbalanced_train": {
+      "unbalanced_test": {
+        "accuracy": 0.5169,
+        "loss": 1.3493
+      }
+    },
+    "balanced_train": {
+      "balanced_test": {
+        "accuracy": 0.4924,
+        "loss": 1.4766
+      },
+      "unbalanced_test": {
+        "accuracy": 0.4899,
+        "loss": 1.4552
+      }
+    }
+  },
+  "ResNet18": {
+    "unbalanced_train": {
+      "unbalanced_test": {
+        "accuracy": 0.4707,
+        "loss": 1.4653
+      }
+    },
+    "balanced_train": {
+      "balanced_test": {
+        "accuracy": 0.4667,
+        "loss": 1.5569
+      },
+      "unbalanced_test": {
+        "accuracy": 0.4504,
+        "loss": 1.5166
+      }
+    }
+  },
+  "VGG16": {
+    "unbalanced_train": {
+      "unbalanced_test": {
+        "accuracy": 0.6071,
+        "loss": 1.1234
+      }
+    },
+    "balanced_train": {
+      "balanced_test": {
+        "accuracy": 0.5394,
+        "loss": 1.2986
+      },
+      "unbalanced_test": {
+        "accuracy": 0.5349,
+        "loss": 1.3320
+      }
+    }
+  },
+  "VGG19": {
+    "unbalanced_train": {
+      "unbalanced_test": {
+        "accuracy": 0.5688,
+        "loss": 1.2092
+      }
+    },
+    "balanced_train": {
+      "balanced_test": {
+        "accuracy": 0.5106,
+        "loss": 1.3947
+      },
+      "unbalanced_test": {
+        "accuracy": 0.5118,
+        "loss": 1.3717
+      }
+    }
+  },
+  "Custom_CNN": {
+    "unbalanced_train": {
+      "unbalanced_test": {
+        "accuracy": 0.7514,
+        "loss": 0.8144
+      }
+    },
+    "balanced_train": {
+      "balanced_test": {
+        "accuracy": 0.5924,
+        "loss": 1.1362
+      },
+      "unbalanced_test": {
+        "accuracy": 0.6240,
+        "loss": 1.0804
+      }
+    }
+  },
+  "ViT": {
+    "unbalanced_train": {
+      "unbalanced_test": {
+        "accuracy": 0.7638,
+        "loss": 0.7343
+      }
+    },
+    "balanced_train": {
+      "balanced_test": {
+        "accuracy": 0.7500,
+        "loss": 0.7966
+      },
+      "unbalanced_test": {
+        "accuracy": 0.7694,
+        "loss": 0.7158
+      }
+    }
+  }
+}
