@@ -1,9 +1,3 @@
----
-title: Galaxy_Morphology_Classification_using_CNNs_and_ViT
-app_file: inference/app.py
-sdk: gradio
-sdk_version: 6.2.0
----
 # Galaxy Morphology Classification (PyTorch)
 ---
 
@@ -80,17 +74,29 @@ After export, `astroNN` is no longer required.
 
 **Final Dataset Structure**
 ```
-data/Galaxy10_DECaLS/
-├── train/
-│   ├── barred_spiral/
-│   ├── merging/
-│   └── ...
-├── val/
-│   ├── barred_spiral/
-│   └── ...
-└── test/
-    ├── barred_spiral/
-    └── ...
+data/
+├── Galaxy10_DECaLS/
+│   ├── train/
+│   │   ├── barred_spiral/
+│   │   ├── merging/
+│   │   └── ...
+│   ├── val/
+│   │   ├── barred_spiral/
+│   │   └── ...
+│   └── test/
+│       ├── barred_spiral/
+│       └── ...
+│
+├── Galaxy10_DECaLS_Balanced/
+│   ├── train/
+│   │   ├── barred_spiral/
+│   │   ├── merging/
+│   │   └── ...
+│   └── test/
+│       ├── barred_spiral/
+│       └── ...
+
+
 ``` 
 *The `data/` directory is git ignored and treated as immutable once generated.*
 
@@ -111,5 +117,112 @@ galaxy_morphology_classification/
 ├── .gitignore
 └── README.md
 ```
+<br>
+
+## Experimental Results
+
+This section summarizes the test set performance of all evaluated models under different training and evaluation conditions.
+Two training regimes were considered:
+
+- Large unbalanced dataset (original class distribution)
+
+- Balanced dataset (class balanced via resampling)
+
+Each balanced model was evaluated on both:
+
+- A balanced test set
+
+- The original unbalanced test set
+
+All metrics reported below correspond to held out test data.
+
+### CNN and Transformer Performance Overview
+
+| Model| Training Data | Test Data|Test Accuracy|Test Loss|
+|---|---|---|---|---|
+| ResNet50|Unbalanced|Unbalanced|0.5259|1.3268|
+| ResNet50|Balanced|Balanced|0.4833|1.4588|
+| ResNet50|Balanced|Unbalanced|0.4752|1.4446|
+| ResNet26|Unbalanced|Unbalanced|0.5169|1.3493|
+| ResNet26|Balanced|Balanced|0.4924|1.4766|
+| ResNet26|Balanced|Unbalanced|0.4899|1.4552|
+| ResNet18|Unbalanced|Unbalanced|0.4707|1.4653|
+| ResNet18|Balanced|Balanced|0.4667|1.5569|
+| ResNet18|Balanced|Unbalanced|0.4504|1.5166|
+| VGG16|Unbalanced|Unbalanced|0.5874|1.1584|
+| VGG16|Balanced|Balanced|0.5394|1.2986|
+| VGG16|Balanced|Unbalanced|0.5349|1.3320|
+| VGG19|Unbalanced|Unbalanced|0.5197|1.3807|
+| VGG19|Balanced|Balanced|0.5688|1.2092|
+| VGG19|Balanced|Unbalanced|0.5688|1.2092|
+| Custom CNN|Unbalanced|Unbalanced|0.7514|0.8144|
+| Custom CNN|Balanced|Balanced|0.5924|1.1362|
+| Custom CNN|Balanced|Unbalanced|0.6240|1.0804|
+| ViT|Unbalanced|Unbalanced|0.7638|0.7343|
+| ViT|Balanced|Balanced|0.7485|0.8747|
+| ViT|Balanced|Unbalanced|0.7717|0.7687|
+
+### Key Observations
+
+1. **Vision Transformer achieves the best overall performance**
+
+The Vision Transformer consistently outperforms all CNN based architectures across both balanced and unbalanced evaluation settings. Its performance remains stable even when trained on balanced data and evaluated on the original unbalanced distribution, indicating strong generalization.
+
+This suggests that global self attention is particularly effective for galaxy morphology classification, especially for complex and irregular structures.
+
+2. **Custom CNN performs competitively with ViT**
+
+The custom CNN achieves strong performance, closely approaching the Vision Transformer on the unbalanced dataset. This indicates that with appropriate architectural design, convolutional models can still be highly effective for this task.
+
+However, the drop in performance when trained on balanced data highlights the sensitivity of CNNs to changes in data distribution.
+
+3. **VGG models outperform ResNet variants**
+
+Among CNN based architectures, VGG16 and VGG19 consistently outperform ResNet18, ResNet26, and ResNet50. In particular, VGG19 trained on balanced data demonstrates improved generalization across both balanced and unbalanced test sets.
+
+This may be attributed to the deeper sequential convolutional structure of VGG models, which appears better suited to capturing fine grained morphological features.
+
+4. **ResNet depth does not correlate with better performance**
+
+Increasing ResNet depth does not lead to improved accuracy in this task. ResNet50 performs only marginally better than ResNet26 and ResNet18, and in some cases performs worse when trained on balanced data.
+
+This suggests that residual depth alone is insufficient for modeling the structural complexity present in galaxy morphology images.
+
+5. **Impact of dataset balancing**
+
+Training on a balanced dataset generally improves class level fairness but often leads to reduced overall accuracy on the original unbalanced distribution. This trade off is particularly evident in CNN based models.
+
+The Vision Transformer is notably less affected by this trade off, maintaining high performance across both evaluation settings.
+
+### Summary
+
+Overall, the results demonstrate that:
+
+- *Vision Transformers provide the most robust and generalizable performance for galaxy morphology classification*
+
+- *Carefully designed CNNs can still achieve competitive results*
+
+- *Dataset balancing introduces important trade offs that must be evaluated in context*
+
+- *Disturbed and irregular morphologies remain challenging for convolutional architectures*
+
+- *These findings support the use of transformer based models for future large scale galaxy morphology studies.*
+<br>
+
+## Future Work
+
+Planned extensions include:
+
+- Training on larger Galaxy Zoo and DECaLS datasets
+
+- Exploring hybrid CNN Transformer architectures
+
+- Self supervised pretraining on unlabeled galaxy data
+
+- Systematic analysis of morphological ambiguity
+
+- Scaling experiments to larger model sizes
+
+
 *This structure is intentionally modular and scalable.*
 
