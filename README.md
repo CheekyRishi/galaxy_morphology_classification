@@ -188,7 +188,13 @@ Increasing ResNet depth does not lead to improved accuracy in this task. ResNet5
 
 This suggests that residual depth alone is insufficient for modeling the structural complexity present in galaxy morphology images.
 
-5. **Impact of dataset balancing**
+5. **Consistent failure of CNNs on disturbed galaxies**
+
+Across all convolutional architectures evaluated, the disturbed galaxy class is consistently the most poorly classified. This behavior persists regardless of model depth, architecture type, or dataset balancing strategy.
+
+In contrast, the Vision Transformer does not exhibit the same degradation on this class, indicating a stronger ability to model global irregularities, asymmetries, and long range spatial dependencies that characterize disturbed morphologies.
+
+6. **Impact of dataset balancing**
 
 Training on a balanced dataset generally improves class level fairness but often leads to reduced overall accuracy on the original unbalanced distribution. This trade off is particularly evident in CNN based models.
 
@@ -213,15 +219,17 @@ Overall, the results demonstrate that:
 
 Planned extensions include:
 
-- Training on larger Galaxy Zoo and DECaLS datasets
+- Vision Transformers provide the most robust and generalizable performance for galaxy morphology classification
 
-- Exploring hybrid CNN Transformer architectures
+- Carefully designed CNNs can still achieve competitive results
 
-- Self supervised pretraining on unlabeled galaxy data
+- VGG style architectures outperform residual networks in this task
 
-- Systematic analysis of morphological ambiguity
+- Dataset balancing introduces important trade offs that must be evaluated in context
 
-- Scaling experiments to larger model sizes
+- Disturbed and highly irregular morphologies remain challenging for convolutional architectures
+
+- Transformer based models offer a clear advantage for capturing global galaxy structure
 
 
 *This structure is intentionally modular and scalable.*
