@@ -24,7 +24,7 @@ CHECKPOINTS = {
     "resnet26": "resnet26/Resnet26_33_epochs_trainable_classifier_early_stopping.pth",
     "resnet50": "resnet50/Resnet50_62_epochs_trainable_classifier_early_stopper.pth",
     "custom_cnn": "custom_cnn/CustomCNN_25_epochs_early_stopping.pth",
-    "vgg16": "vgg16/VGG16_44_epochs_trainable_classifier_early_stopping_balanced_dataset.pth",
+    "vgg16": "vgg16/VGG16_15_epochs_trainable_classifier_early_stopping.pth",
     "vgg19": "vgg19/VGG19_60_epochs_trainable_classifier_early_stopping.pth",
     "vit": "vit/vit_best_balanced_dataset.pth",
 }
