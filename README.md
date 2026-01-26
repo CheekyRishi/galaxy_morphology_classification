@@ -112,14 +112,64 @@ data/
 
 ``` 
 galaxy_morphology_classification/
-├── data/                    # git ignored, processed datasets
-│   └── Galaxy10_DECaLS/
-├── datasets/                # PyTorch dataset utilities
-├── models/                  # CNN and Transformer models
+├── checkpoints/                     # (git-ignored) trained model weights
+│   ├── custom_cnn/
+│   ├── resnet18/
+│   ├── resnet26/
+│   ├── resnet50/
+│   ├── vgg16/
+│   ├── vgg19/
+│   └── vit/
+│
+├── data/                            # (git-ignored) processed datasets
+│   ├── Galaxy10_DECaLS/             # original class-imbalanced dataset
+│   │   ├── train/
+│   │   ├── val/
+│   │   └── test/
+│   └── Galaxy10_DECaLS_Balanced/    # class-balanced variant
+│       ├── train/
+│       └── test/
+│
+├── inference/
+│   ├── app.py                      # Gradio + Hugging Face Spaces app
+│   └── config.py                   # inference-specific configuration
+│
+├── notebooks/
+│   ├── eda.ipynb                   # exploratory data analysis
+│   └── train_and_evaluate.ipynb    # experimentation & ablation studies
+│
+├── results/                        # evaluation outputs (metrics, plots)
+│
 ├── scripts/
-│   └── export_galaxy10.py   # one time dataset export script
-├── training/                # training loops and trainers
-├── utils/                   # helpers, metrics, logging
+│   └── export_galaxy10.py           # one-time dataset export from HDF5
+│
+├── src/                             # core library code
+│   ├── data/
+│   │   ├── dataloaders.py
+│   │   └── transforms.py
+│   │
+│   ├── models/
+│   │   ├── custom_cnn.py
+│   │   ├── resnet.py
+│   │   ├── vgg.py
+│   │   ├── vit.py
+│   │   └── get_model.py
+│   │
+│   ├── training/
+│   │   └── engine.py               # unified training loop
+│   │
+│   ├── evaluation/
+│   │   └── predictions.py
+│   │
+│   └── utils/
+│       ├── early_stopping.py
+│       ├── save_model.py
+│       ├── set_seed.py
+│       └── visualisations.py
+│
+├── pyproject.toml                  # packaging & tooling metadata
+├── requirements.txt                # runtime dependencies
+├── LICENSE
 ├── .gitignore
 └── README.md
 ```
