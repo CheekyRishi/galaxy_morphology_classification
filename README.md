@@ -1,3 +1,11 @@
+---
+title: Galaxy Morphology Classification using CNNs and ViT
+sdk: gradio
+sdk_version: 6.2.0
+app_file: inference/app.py
+short_description: Comparing CNNs and ViT for galaxy morphology classification
+---
+
 # Galaxy Morphology Classification (PyTorch)
 ---
 
@@ -286,4 +294,3 @@ Planned extensions include:
 
 
 *This structure is intentionally modular and scalable.*
-
