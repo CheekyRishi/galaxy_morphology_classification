@@ -140,9 +140,6 @@ galaxy_morphology_classification/
 │
 ├── results/                        # evaluation outputs (metrics, plots)
 │
-├── scripts/
-│   └── export_galaxy10.py           # one-time dataset export from HDF5
-│
 ├── src/                             # core library code
 │   ├── data/
 │   │   ├── dataloaders.py
