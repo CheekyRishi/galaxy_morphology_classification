@@ -69,7 +69,13 @@ def load_model(model_name: str):
         repo_type="model"
     )
 
-    model = get_model(model_name, num_classes=len(CLASS_NAMES))
+    model_or_tuple = get_model(model_name, num_classes=len(CLASS_NAMES))
+
+    # Handle models that return (model, transform)
+    if isinstance(model_or_tuple, tuple):
+        model = model_or_tuple[0]
+    else:
+        model = model_or_tuple
 
     state = torch.load(ckpt_path, map_location=DEVICE)
     model.load_state_dict(state)
@@ -78,6 +84,7 @@ def load_model(model_name: str):
 
     _MODEL_CACHE[model_name] = model
     return model
+
 
 
 
