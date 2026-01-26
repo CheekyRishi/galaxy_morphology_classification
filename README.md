@@ -202,18 +202,18 @@ All metrics reported below correspond to held out test data.
 | ResNet18|Unbalanced|Unbalanced|0.4707|1.4653|
 | ResNet18|Balanced|Balanced|0.4667|1.5569|
 | ResNet18|Balanced|Unbalanced|0.4504|1.5166|
-| VGG16|Unbalanced|Unbalanced|0.5874|1.1584|
+| VGG16|Unbalanced|Unbalanced|0.6071|1.1234|
 | VGG16|Balanced|Balanced|0.5394|1.2986|
 | VGG16|Balanced|Unbalanced|0.5349|1.3320|
-| VGG19|Unbalanced|Unbalanced|0.5197|1.3807|
-| VGG19|Balanced|Balanced|0.5688|1.2092|
-| VGG19|Balanced|Unbalanced|0.5688|1.2092|
+| VGG19|Unbalanced|Unbalanced|0.5688|1.2092|
+| VGG19|Balanced|Balanced|0.5106|1.3947|
+| VGG19|Balanced|Unbalanced|0.5118|1.3717|
 | Custom CNN|Unbalanced|Unbalanced|0.7514|0.8144|
 | Custom CNN|Balanced|Balanced|0.5924|1.1362|
 | Custom CNN|Balanced|Unbalanced|0.6240|1.0804|
 | ViT|Unbalanced|Unbalanced|0.7638|0.7343|
-| ViT|Balanced|Balanced|0.7485|0.8747|
-| ViT|Balanced|Unbalanced|0.7717|0.7687|
+| ViT|Balanced|Balanced|0.7500|0.7966|
+| ViT|Balanced|Unbalanced|0.7694|0.7158|
 
 ### Key Observations
 
