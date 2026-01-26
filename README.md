@@ -1,6 +1,12 @@
 # Galaxy Morphology Classification (PyTorch)
 ---
 
+## Live Demo
+
+🔗 Hugging Face Space:  
+https://huggingface.co/spaces/Rishabh-9090/Galaxy_Morphology_Classification_using_CNNs_and_ViT
+
+
 ## Overview
 
 This repository contains a clean, reproducible, and research oriented implementation of galaxy morphology classification using PyTorch.
