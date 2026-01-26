@@ -1,3 +1,9 @@
+---
+title: Galaxy_Morphology_Classification_using_CNNs_and_ViT
+app_file: inference/app.py
+sdk: gradio
+sdk_version: 6.2.0
+---
 # Galaxy Morphology Classification (PyTorch)
 ---
 
