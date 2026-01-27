@@ -73,17 +73,23 @@ The dataset uses the following class mapping:
 
 <br>
 
-## Dataset Preparation Pipeline
+## Dataset Preparation and Experiment Pipelines Pipeline
 
-The dataset preparation follows a one time extraction workflow:
+The dataset preparation process was designed to support **controlled experimentation, reproducibility, and multiple dataset variants**, rather than a single one time split.
 
-1. Galaxy10 DECaLS is downloaded automatically via `astroNN`
-2. The raw `.h5` file is cached outside the repository
-3. Images are exported into a disk based directory structure
-4. Data is split into train, validation, and test sets
-5. PyTorch `ImageFolder` is used for all experiments
+1. The Galaxy10 DECaLS dataset is downloaded programmatically using `astroNN` and cached outside the repository to keep the codebase clean and lightweight.
 
-After export, `astroNN` is no longer required.
+2. Raw data is extracted from the `.h5` format and converted into image files organized by galaxy morphology class.
+
+3. Multiple dataset variants are created, including balanced, unbalanced, and reduced size subsets, to study the effect of class distribution and dataset scale on model performance.
+
+4. All dataset splits follow a deterministic train, validation, and test strategy with fixed random seeds to ensure reproducibility across experiments.
+
+5. Dataset metadata, class mappings, and split information are serialized to JSON files for consistent reuse during training and evaluation.
+
+6. A disk based directory structure compatible with PyTorch ImageFolder is generated, enabling fast experimentation without reprocessing the raw dataset.
+
+After the initial extraction and structuring, the training and evaluation pipelines operate independently of `astroNN`.
 
 
 **Final Dataset Structure**
