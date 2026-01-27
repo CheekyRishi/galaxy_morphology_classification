@@ -73,7 +73,7 @@ The dataset uses the following class mapping:
 
 <br>
 
-## Dataset Preparation and Experiment Pipelines Pipeline
+## Dataset Preparation and Experiment Pipelines
 
 The dataset preparation process was designed to support **controlled experimentation, reproducibility, and multiple dataset variants**, rather than a single one time split.
 
